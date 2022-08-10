@@ -31,29 +31,45 @@ class file_info :
     def setWidthSizestr(self, uwidth) :
         self.width_sizestr = uwidth
 
+suffixes = ['K', 'M', 'G', 'T']
 
+def print_error(message) :
+    print('[ERROR]: {text}'.format(text=message))
+        
 def str2size(sizestr) :
     if sizestr.isnumeric() :
         return float(sizestr)
-    elif 'K' in sizestr :
-        sizenum = sizestr.split('K')[0]
-        return float(sizenum) * 1000
-    elif 'M' in sizestr :
-        sizenum = sizestr.split('M')[0]
-        return float(sizenum) * 1000 * 1000
-    elif 'G' in sizestr :
-        sizenum = sizestr.split('G')[0]
-        return float(sizenum) * 1000 * 1000 * 1000
-    elif 'T' in sizestr :
-        sizenum = sizestr.split('T')[0]
-        return float(sizenum) * 1000 * 1000 * 1000 * 1000
+
+    factor = 1000
+    for suff in suffixes :
+        if suff in sizestr :
+            sizenum = sizestr.split(suff)[0]
+            return float(sizenum) * factor
+        else :
+            factor = factor * 1000
+    
+
+def size2str(size) :
+    nit = 0
+    while size / 1000 > 1 :
+        size = size / 1000.
+        nit = nit + 1
+
+    if size / 10 < 1 :
+        size = round(size * 10) / 10
+    else :
+        size = round(size)
+
+    return str(size) + suffixes[nit]
+
 
 def getUname() :
     command = "whoami"                                                                   
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, text=True)
     out, err = process.communicate()
     return out.split('\n')[0]
-       
+
+
 def main() :
 
     defaulthome = "/home/" + getUname() + "/"
@@ -96,18 +112,16 @@ def main() :
         if os.path.isdir(fullpath) :
             ftype = 'd'
 
-        IsReadable = True
-
-        command = 'du%-sh%' + fullpath  
+        command = 'du%-s%' + fullpath  
         process = subprocess.Popen(command.split('%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if process.stderr.read() != '' :
             print("\nCould not access " + fullpath + ". Does the file name contain non-UTF-8 compliant characters?")
-            IsReadable = False
+            continue
         out, err = process.communicate()
-        sizestr = out.split('\n')[0].split('\t')[0]
 
-        if IsReadable :
-            filelist.append(file_info(item, ftype, sizestr, str2size(sizestr)))
+        size = float(out.split('\n')[0].split('\t')[0])
+        sizestr = size2str(size)
+        filelist.append(file_info(item, ftype, sizestr, size))
 
         if len(item) > maxwidth_name :
             maxwidth_name = len(item)
