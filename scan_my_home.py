@@ -34,8 +34,13 @@ class file_info :
 suffixes = ['K', 'M', 'G', 'T']
 
 def print_error(message) :
-    print('[ERROR]: {text}'.format(text=message))
-        
+    sys.stdout.write('\033[0;31m\n[ERROR]: {text} \033[0m\n'.format(text=message))
+    sys.stdout.flush()
+
+def print_warning(message) :
+    sys.stdout.write('\033[0;33m\n[WARNING]: {text} \033[0m\n'.format(text=message))
+    sys.stdout.flush()
+    
 def str2size(sizestr) :
     if sizestr.isnumeric() :
         return float(sizestr)
@@ -115,7 +120,7 @@ def main() :
         command = 'du%-s%' + fullpath  
         process = subprocess.Popen(command.split('%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if process.stderr.read() != '' :
-            print("\nCould not access " + fullpath + ". Does the file name contain non-UTF-8 compliant characters?")
+            print_warning("Could not access " + fullpath + ". Does the file name contain non-UTF-8 compliant characters?")
             continue
         out, err = process.communicate()
 
