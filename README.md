@@ -19,3 +19,4 @@ usage: scan_my_home.py [-h] [-d DIR]
 optional arguments:
   -h, --help  show this help message and exit
   -d DIR      override the directory DIR to be scanned.
+  -r          Recursice scanning: list all files in all subfolders.

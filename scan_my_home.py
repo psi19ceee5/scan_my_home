@@ -83,6 +83,7 @@ def main() :
 
     parser = argparse.ArgumentParser(description='Scan and sort files by size.')
     parser.add_argument('-d', metavar='DIR', type=str, required=False, help='override the directory DIR to be scanned.')
+    parser.add_argument('-r', action='store_true', help='Recursice scanning: list all files in all subfolders.')
     args = parser.parse_args()
 
     if args.d :
@@ -116,6 +117,12 @@ def main() :
         if os.path.isdir(fullpath) :
             ftype = 'd'
 
+        # to implement
+        #
+        # if args.r :
+        #    out, err = scan_dir(fullpath, recursive=true)
+        # else :
+        #    out, err = scan_dir(fullpath, recursive=false)
         command = 'du%-s%' + fullpath  
         process = subprocess.Popen(command.split('%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if process.stderr.read() != '' :
