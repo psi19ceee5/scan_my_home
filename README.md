@@ -14,6 +14,8 @@ other directories than /home/$USER can be scanned and sorted in the same manner.
 is meant to give guidance to a human who wants to clean up large and messy folders on devices 
 with limited disk resources.
 
-Usage:
+usage: scan_my_home.py [-h] [-d DIR]
 
- scan_my_home.sh [directory]
+optional arguments:
+  -h, --help  show this help message and exit
+  -d DIR      override the directory DIR to be scanned.

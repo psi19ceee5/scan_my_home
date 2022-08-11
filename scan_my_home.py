@@ -4,6 +4,7 @@ import os
 import sys
 import subprocess
 import itertools
+import argparse
 
 class file_info :
     def __init__(self, uname, uftype, usizestr, usize) :
@@ -79,19 +80,17 @@ def main() :
 
     defaulthome = "/home/" + getUname() + "/"
     thehome = defaulthome
-    
-    if len(sys.argv) == 2 :
-        thehome = sys.argv[1]
+
+    parser = argparse.ArgumentParser(description='Scan and sort files by size.')
+    parser.add_argument('-d', metavar='DIR', type=str, required=False, help='override the directory DIR to be scanned.')
+    args = parser.parse_args()
+
+    if args.d :
+        thehome = args.d
         if thehome[-1] != "/" :
             thehome = thehome + "/"
 
-    if len(sys.argv) > 2 :
-        print("scan_my_home.py:\n")
-        print("   scans your home directory and lists all files and directories sorted by the size of their content.\n")
-        print("   usage: scan_my_home.py [Directory]\n")
-        return 1
-
-    print("scanning home...", end='')
+    print("scanning " + thehome + " ", end='')
     
     command = "ls -a " + thehome
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, text=False, encoding='cp1250')
