@@ -123,10 +123,10 @@ def main() :
         #    out, err = scan_dir(fullpath, recursive=true)
         # else :
         #    out, err = scan_dir(fullpath, recursive=false)
-        command = 'du%-s%' + fullpath  
+        command = 'du%-s%' + fullpath
         process = subprocess.Popen(command.split('%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if process.stderr.read() != '' :
-            print_warning("Could not access " + fullpath + ". Does the file name contain non-UTF-8 compliant characters?")
+            print_warning("Could not access " + fullpath + ". Do you have read permissions to all files? Does the file name contain non-UTF-8 compliant characters?")
             continue
         out, err = process.communicate()
 
