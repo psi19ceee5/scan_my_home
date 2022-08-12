@@ -154,7 +154,7 @@ def main() :
     for item in filelist :
         TotalBytes = TotalBytes + item.size
 
-    print("\nTotal: " + str(TotalBytes) + "B")
+    print("\nTotal: " + size2str(TotalBytes) + " (" + str(TotalBytes) + "B)")
     
     for item in filelist :
         print(item)
