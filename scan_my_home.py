@@ -87,8 +87,8 @@ def getUname() :
 
 def scan_file(upath, ufilelist, uftype) :
 
-    command = 'du%-s%' + upath
-    process = subprocess.Popen(command.split('%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    command = 'du%%%-s%%%' + upath
+    process = subprocess.Popen(command.split('%%%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if process.stderr.read() != '' :
         print_warning("Could not access " + upath + ". Do you have read permissions to all files? Does the file name contain non-UTF-8 compliant characters?")
         return '', 'ERROR'
@@ -107,8 +107,8 @@ def scan_file(upath, ufilelist, uftype) :
 
 def scan_dir(udir, ufilelist, recursive=False) :
 
-    command = "ls%-a%" + udir
-    process = subprocess.Popen(command.split('%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=False, encoding='cp1250')
+    command = "ls%%%-a%%%" + udir
+    process = subprocess.Popen(command.split('%%%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=False, encoding='cp1250')
     if process.stderr.read() != '' :
         print_warning("Could not access " + udir + ". Do you have read permissions to all files? Does the file name contain non-UTF-8 compliant characters?")
         return '', 'ERROR'
@@ -186,7 +186,7 @@ def main() :
         TotalBytes = TotalBytes + item.size
 
     print("\nTotal: " + size2str(TotalBytes) + " (" + str(TotalBytes) + "B)")
-    print("Number of files: " + len(filelist))
+    print("Number of files: " + str(len(filelist)))
     
     for item in filelist :
         print(item)
