@@ -154,6 +154,7 @@ def scan_dir(udir, ufilelist, recursive=False) :
         out, err = process.communicate()
     except UnicodeDecodeError :
         print_warning("Caught execption of type UnicodeDecodeError. Skipping directory " + udir + ".")
+        return '', 'ERROR'
     
     files = str(out).split('\n')
 
