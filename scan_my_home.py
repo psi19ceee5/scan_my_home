@@ -107,41 +107,35 @@ def scan_file(upath, ufilelist, uftype) :
 
 def scan_dir(udir, ufilelist, recursive=False) :
 
-    if recursive :
-        command = "find%%%" + udir + "%%%-type%%%f"
-    else :
-        command = "ls%%%-a%%%" + udir
+    command = "ls%%%-a%%%" + udir
     process = subprocess.Popen(command.split('%%%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=False, encoding='cp1250')
-    # if process.stderr.read() != '' :
-    #     print_warning("Could not access " + udir + ". Do you have read permissions to all files? Does the file name contain non-UTF-8 compliant characters?")
-    #     return '', 'ERROR'
+    if process.stderr.read() != '' :
+        print_warning("Could not access " + udir + ". Do you have read permissions to all files? Does the file name contain non-UTF-8 compliant characters?")
+        return '', 'ERROR'
     out, err = process.communicate()
     
     files = str(out).split('\n')
-
-    if '.' in files :
-        files.remove('.')
-    if '..' in files :
-        files.remove('..')
-    if '' in files :
-        files.remove('')
-
+    
+    files.remove('.')
+    files.remove('..')
+    files.remove('')
+    
     for item in files :
-        if recursive :
-            fullpath = item
-            ftype = 'f'
+
+        if udir[-1] == "/" :
+            fullpath = udir + item
         else :
-            if udir[-1] == "/" :
-                fullpath = udir + item
-            else :
-                fullpath = udir + "/" + item
-
-            ftype = 'f' 
-            if os.path.isdir(fullpath) :
-                ftype = 'd'
-
-        out, err = scan_file(fullpath, ufilelist, ftype)
+            fullpath = udir + "/" + item
         
+        ftype = 'f' 
+        if os.path.isdir(fullpath) :
+            ftype = 'd'
+
+        if ftype == 'f' or not recursive :
+            out, err = scan_file(fullpath, ufilelist, ftype)
+        else :
+            out, err = scan_dir(fullpath, ufilelist, recursive=recursive)
+
     return out, err
 
 
