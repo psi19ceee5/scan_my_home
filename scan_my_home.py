@@ -33,8 +33,50 @@ class file_info :
     def setWidthSizestr(self, uwidth) :
         self.width_sizestr = uwidth
 
-        
+
+class progress_indicator :
+    
+    def __init__(self, frequency=1, maxc=0, symb=".", recursiveopts=False) :
+        self._recursiveopts = recursiveopts
+        self._frequency = frequency
+        self._maxc = maxc
+        self._symb = symb
+        self._counter = 0
+        self._symbcnt = 0
+        self.setRecursiveOpts()
+
+    def setRecursive(self, recursiveopts) :
+        self._recursiveopts = recursiveopts
+        self.setRecursiveOpts()
+
+    def setRecursiveOpts(self) :
+        if self._recursiveopts :
+            self._frequency = 100
+            self._maxc = 10
+
+    def resetCounter(self) :
+        self._counter = 0
+
+    def resetSymbCnt(self) :
+        self._symbcnt = 0
+
+    def emit(self) :
+        if self._counter % self._frequency == 0 :
+            sys.stdout.write(self._symb)
+            self._symbcnt = self._symbcnt + 1
+            if self._symbcnt == self._maxc :
+                sys.stdout.write('\b'*self._maxc)
+                sys.stdout.flush()
+                sys.stdout.write(' '*self._maxc)
+                sys.stdout.write('\b'*self._maxc)
+                sys.stdout.flush()
+                self.resetSymbCnt()
+            sys.stdout.flush()
+        self._counter = self._counter + 1
+
+
 suffixes = ['K', 'M', 'G', 'T']
+progind = progress_indicator()
 
 
 def print_error(message) :
@@ -99,8 +141,7 @@ def scan_file(upath, ufilelist, uftype) :
     sizestr = size2str(size)
     ufilelist.append(file_info(upath, uftype, sizestr, size))
 
-    sys.stdout.write('.')
-    sys.stdout.flush()
+    progind.emit()
 
     return out, err
 
@@ -108,17 +149,20 @@ def scan_file(upath, ufilelist, uftype) :
 def scan_dir(udir, ufilelist, recursive=False) :
 
     command = "ls%%%-a%%%" + udir
-    process = subprocess.Popen(command.split('%%%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=False, encoding='cp1250')
-    if process.stderr.read() != '' :
-        print_warning("Could not access " + udir + ". Do you have read permissions to all files? Does the file name contain non-UTF-8 compliant characters?")
-        return '', 'ERROR'
-    out, err = process.communicate()
+    process = subprocess.Popen(command.split('%%%'), stdout=subprocess.PIPE, stderr=None, text=False, encoding='cp1250')
+    try :
+        out, err = process.communicate()
+    except UnicodeDecodeError :
+        print_warning("Caught execption of type UnicodeDecodeError. Skipping directory " + udir + ".")
     
     files = str(out).split('\n')
-    
-    files.remove('.')
-    files.remove('..')
-    files.remove('')
+
+    if '.' in files :
+        files.remove('.')
+    if '..' in files :
+        files.remove('..')
+    if '' in files :
+        files.remove('')
     
     for item in files :
 
@@ -130,7 +174,7 @@ def scan_dir(udir, ufilelist, recursive=False) :
         ftype = 'f' 
         if os.path.isdir(fullpath) :
             ftype = 'd'
-
+            
         if ftype == 'f' or not recursive :
             out, err = scan_file(fullpath, ufilelist, ftype)
         else :
@@ -145,14 +189,17 @@ def main() :
     thehome = defaulthome
 
     parser = argparse.ArgumentParser(description='Scan and sort files by size.')
-    parser.add_argument('-d', metavar='DIR', type=str, required=False, help='override the directory DIR to be scanned.')
+    parser.add_argument('-d', metavar='DIR', type=str, required=False, help='Override the directory DIR to be scanned.')
     parser.add_argument('-r', action='store_true', help='Recursice scanning: list all files in all subfolders.')
+    parser.add_argument('-f', metavar='FILE', type=str, required=False, help='specify output file for the results. If no output file is given, results are written to stdout.')
     args = parser.parse_args()
 
     if args.d :
         thehome = args.d
         if thehome[-1] != "/" :
             thehome = thehome + "/"
+
+    progind.setRecursive(args.r)
 
     print("scanning " + thehome + " ", end='')
 
@@ -185,11 +232,22 @@ def main() :
     for item in filelist :
         TotalBytes = TotalBytes + item.size
 
-    print("\nTotal: " + size2str(TotalBytes) + " (" + str(TotalBytes) + "B)")
-    print("Number of files: " + str(len(filelist)))
-    
+    printstr1 = "Total: " + size2str(TotalBytes) + " (" + str(TotalBytes) + "B)"
+    printstr2 = "Number of files: " + str(len(filelist))
+
+    orig_stdout = sys.stdout
+
+    if args.f :
+        sys.stdout = open(args.f, 'w')
+
+    print("\n" + printstr1)
+    print(printstr2)
     for item in filelist :
         print(item)
+
+    sys.stdout = orig_stdout
+    sys.stdout.write("\n")
+    sys.stdout.flush()
 
 
 if __name__ == "__main__" :
