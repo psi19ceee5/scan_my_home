@@ -132,7 +132,7 @@ def scan_file(upath, ufilelist, uftype) :
     command = 'du%%%-s%%%' + upath
     process = subprocess.Popen(command.split('%%%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if process.stderr.read() != '' :
-        print_warning("Could not access " + upath + ". Do you have read permissions to all files? Does the file name contain non-UTF-8 compliant characters?")
+        print_warning("Could not access file " + upath + ". Do you have read permissions to all files? Does the file name contain non-UTF-8 compliant characters?")
         return '', 'ERROR'
     out, err = process.communicate()
 
