@@ -190,8 +190,8 @@ def main() :
     thehome = defaulthome
 
     parser = argparse.ArgumentParser(description='Scan and sort files by size.')
-    parser.add_argument('-d', metavar='DIR', type=str, required=False, help='Override the directory DIR to be scanned.')
-    parser.add_argument('-r', action='store_true', help='Recursice scanning: list all files in all subfolders.')
+    parser.add_argument('-r', action='store_true', help='recursice scanning: list all files in all subfolders.')
+    parser.add_argument('-d', metavar='DIR', type=str, required=False, help='override the directory DIR to be scanned.')
     parser.add_argument('-f', metavar='FILE', type=str, required=False, help='specify output file for the results. If no output file is given, results are written to stdout.')
     args = parser.parse_args()
 
