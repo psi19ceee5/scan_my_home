@@ -19,7 +19,7 @@ class file_info :
 
     def __str__(self) :
         retstr = 'Size: ' + '{sizestr:<{num}}'.format(sizestr=self.sizestr, num=self.width_sizestr+2)
-        retstr = retstr + ' (' + '{size:<{num}}'.format(size=str(self.size)+'K)', num=self.width_size+5)
+        retstr = retstr + '{size:<{num}}'.format(size='('+str(self.size)+'K)', num=self.width_size+5)
         retstr = retstr + 'Type: ' + '{ftype:<{num}}'.format(ftype=self.ftype, num=self.width_ftype+2)
         retstr = retstr + 'Name: ' + '{name:<{num}}'.format(name=self.name, num=self.width_name+2)
         return retstr
