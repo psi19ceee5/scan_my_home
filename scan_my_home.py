@@ -127,7 +127,7 @@ def getUname() :
     return out.split('\n')[0]
 
 
-def scan_file(upath, ufilelist, uftype) :
+def scan_file(upath, ufilelist, uftype, verbose=False) :
 
     command = 'du%%%-s%%%' + upath
     process = subprocess.Popen(command.split('%%%'), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -140,13 +140,15 @@ def scan_file(upath, ufilelist, uftype) :
 
     sizestr = size2str(size)
     ufilelist.append(file_info(upath, uftype, sizestr, size))
+    if verbose :
+        print(str(len(ufilelist)) + " -- " + upath)
 
     progind.emit()
 
     return out, err
 
 
-def scan_dir(udir, ufilelist, recursive=False) :
+def scan_dir(udir, ufilelist, recursive=False, verbose=False) :
 
     command = "ls%%%-a%%%" + udir
     process = subprocess.Popen(command.split('%%%'), stdout=subprocess.PIPE, stderr=None, text=False, encoding='cp1250')
@@ -171,15 +173,18 @@ def scan_dir(udir, ufilelist, recursive=False) :
             fullpath = udir + item
         else :
             fullpath = udir + "/" + item
+
+        if os.path.islink(fullpath) :
+            continue
         
         ftype = 'f' 
         if os.path.isdir(fullpath) :
             ftype = 'd'
             
         if ftype == 'f' or not recursive :
-            out, err = scan_file(fullpath, ufilelist, ftype)
+            out, err = scan_file(fullpath, ufilelist, ftype, verbose=verbose)
         else :
-            out, err = scan_dir(fullpath, ufilelist, recursive=recursive)
+            out, err = scan_dir(fullpath, ufilelist, recursive=recursive, verbose=verbose)
 
     return out, err
 
@@ -191,6 +196,7 @@ def main() :
 
     parser = argparse.ArgumentParser(description='Scan and sort files by size.')
     parser.add_argument('-r', action='store_true', help='recursice scanning: list all files in all subfolders.')
+    parser.add_argument('-v', action='store_true', help='increase verbosity.')
     parser.add_argument('-d', metavar='DIR', type=str, required=False, help='override the directory DIR to be scanned.')
     parser.add_argument('-f', metavar='FILE', type=str, required=False, help='specify output file for the results. If no output file is given, results are written to stdout.')
     args = parser.parse_args()
@@ -205,7 +211,7 @@ def main() :
     print("scanning " + thehome + " ", end='')
 
     filelist  = []
-    scan_dir(thehome, filelist, recursive=args.r)
+    scan_dir(thehome, filelist, recursive=args.r, verbose=args.v)
 
     maxwidth_name = 0
     maxwidth_ftype = 0
