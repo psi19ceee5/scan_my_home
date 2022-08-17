@@ -14,9 +14,12 @@ other directories than /home/$USER can be scanned and sorted in the same manner.
 is meant to give guidance to a human who wants to clean up large and messy folders on devices 
 with limited disk resources.
 
-usage: scan_my_home.py [-h] [-d DIR]
+usage: scan_my_home.py [-h] [-r] [-v] [-d DIR] [-f FILE]
 
 optional arguments:
   -h, --help  show this help message and exit
+  -r          recursice scanning: list all files in all subfolders.
+  -v          increase verbosity.
   -d DIR      override the directory DIR to be scanned.
-  -r          Recursice scanning: list all files in all subfolders.
+  -f FILE     specify output file for the results. If no output file is given, results are written to
+              stdout.
