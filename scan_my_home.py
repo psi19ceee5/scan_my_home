@@ -243,7 +243,7 @@ def main() :
     for item in filelist :
         TotalBytes = TotalBytes + item.size
 
-    printstr1 = "Total: " + size2str(TotalBytes) + " (" + str(TotalBytes) + "B)"
+    printstr1 = "Total: " + size2str(TotalBytes) + " (" + str(TotalBytes) + "K)"
     printstr2 = "Number of files: " + str(len(filelist))
 
     orig_stdout = sys.stdout
