@@ -142,8 +142,8 @@ def scan_file(upath, ufilelist, uftype, verbose=False) :
     ufilelist.append(file_info(upath, uftype, sizestr, size))
     if verbose :
         print(str(len(ufilelist)) + " -- " + upath)
-
-    progind.emit()
+    else:
+        progind.emit()
 
     return out, err
 
