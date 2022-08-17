@@ -15,13 +15,13 @@ class file_info :
         self.size = usize
         self.width_name = 45
         self.width_ftype = 3
-        self.width_sizestr = 7
+        self.width_sizestr = 10
 
     def __str__(self) :
-        retstr = 'Name: ' + '{name:<{num}}'.format(name=self.name, num=self.width_name)
-        retstr = retstr + '\tType: ' + '{ftype:<{num}}'.format(ftype=self.ftype, num=self.width_ftype)
-        retstr = retstr + '\tSize: ' + '{sizestr:<{num}}'.format(sizestr=self.sizestr, num=self.width_sizestr)
-        retstr = retstr + ' (' + str(self.size) + 'K)'
+        retstr = 'Size: ' + '{sizestr:<{num}}'.format(sizestr=self.sizestr, num=self.width_sizestr+2)
+        retstr = retstr + ' (' + '{size:<{num}}'.format(size=str(self.size)+'K)', num=self.width_size+5)
+        retstr = retstr + 'Type: ' + '{ftype:<{num}}'.format(ftype=self.ftype, num=self.width_ftype+2)
+        retstr = retstr + 'Name: ' + '{name:<{num}}'.format(name=self.name, num=self.width_name+2)
         return retstr
 
     def setWidthName(self, uwidth) :
@@ -32,6 +32,9 @@ class file_info :
 
     def setWidthSizestr(self, uwidth) :
         self.width_sizestr = uwidth
+
+    def setWidthSize(self, uwidth) :
+        self.width_size = uwidth
 
 
 class progress_indicator :
@@ -139,7 +142,7 @@ def scan_file(upath, ufilelist, uftype, verbose=False) :
     size = float(out.split('\n')[0].split('\t')[0])
 
     sizestr = size2str(size)
-    ufilelist.append(file_info(upath, uftype, sizestr, size))
+    ufilelist.append(file_info(upath, uftype, sizestr, int(size)))
     if verbose :
         print(str(len(ufilelist)) + " -- " + upath)
     else:
@@ -216,22 +219,23 @@ def main() :
     maxwidth_name = 0
     maxwidth_ftype = 0
     maxwidth_sizestr = 0
+    maxwidth_size = 0
 
     for item in filelist :
         if len(item.name) > maxwidth_name :
             maxwidth_name = len(item.name)
-
         if len(item.ftype) > maxwidth_ftype :
             maxwidth_ftype = len(item.ftype)
-
         if len(item.sizestr) > maxwidth_sizestr :
             maxwidth_sizestr = len(item.sizestr)
-
+        if len(str(item.size)) > maxwidth_size :
+            maxwidth_size = len(str(item.size))
 
     for item in filelist :
         item.setWidthName(maxwidth_name)
         item.setWidthFtype(maxwidth_ftype)
         item.setWidthSizestr(maxwidth_sizestr)
+        item.setWidthSize(maxwidth_size)
 
     filelist.sort(key=lambda x: x.size, reverse=True)
 
